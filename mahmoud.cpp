@@ -29,13 +29,16 @@ public:
     void setTimeSpent(double time) { timeSpent = time; }
     void setCaloriesBurnt(double calories) { caloriesBurnt = calories; }
 
-    // Print method
-    void printExerciseInfo() const {
+    // Virtual Print method
+    virtual void printInfo() const {
         cout << "Exercise Name: " << exerciseName << endl;
         cout << "Exercise Type: " << exerciseType << endl;
         cout << "Time Spent: " << timeSpent << " minutes" << endl;
         cout << "Calories Burnt: " << caloriesBurnt << endl;
     }
+
+    // Virtual destructor
+    virtual ~Exercise() = default;
 };
 
 // Cardio Class (inherits from Exercise)
@@ -58,9 +61,9 @@ public:
     void setIntensity(string intensity) { this->intensity = intensity; }
     void setDistance(double distance) { this->distance = distance; }
 
-    // Print method
-    void printCardioInfo() const {
-        printExerciseInfo();
+    // Override Print method
+    void printInfo() const override {
+        Exercise::printInfo();
         cout << "Intensity: " << intensity << endl;
         cout << "Distance: " << distance << " km" << endl;
     }
@@ -89,9 +92,9 @@ public:
     void setRepsCount(int reps) { repsCount = reps; }
     void setWeight(double weight) { this->weight = weight; }
 
-    // Print method
-    void printStrengthTrainingInfo() const {
-        printExerciseInfo();
+    // Override Print method
+    void printInfo() const override {
+        Exercise::printInfo();
         cout << "Sets Count: " << setsCount << endl;
         cout << "Reps Count: " << repsCount << endl;
         cout << "Weight: " << weight << " kg" << endl;
@@ -103,13 +106,13 @@ int main() {
     Cardio run("Running", "Cardio", 30, 300, "High", 5);
     StrengthTraining lift("Weight Lifting", "Strength", 45, 400, 4, 12, 50);
 
-    cout << "Cardio Exercise Info:" << endl;
-    run.printCardioInfo();
+    // Using polymorphism
+    Exercise* exercises[] = { &run, &lift };
 
-    cout << endl;
-
-    cout << "Strength Training Exercise Info:" << endl;
-    lift.printStrengthTrainingInfo();
+    for (Exercise* exercise : exercises) {
+        exercise->printInfo();
+        cout << endl;
+    }
 
     return 0;
 }
