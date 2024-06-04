@@ -173,14 +173,13 @@ class Goal{
         string getGoalDesc(){
             return goalDesc;
         }
-        bool getGoalStatus(){
-            // if (goalStatus){
-            //     return "Goal Achieved";
-            // }
-            // else{
-            //     return "Unfinished Goal";
-            // }
-            return goalStatus;
+        string getGoalStatus(){
+            if (goalStatus){
+                return "Goal Achieved";
+            }
+            else{
+                return "Unfinished Goal";
+            }
         }
         void setGoalStatus(){
             goalStatus = !goalStatus;
@@ -195,9 +194,113 @@ class Goal{
         }
 };
 
+//---------------------------------------------------------------------------------------------
+
+
+// Exercise Class
+class Exercise {
+private:
+    string exerciseName;
+    string exerciseType;
+    double timeSpent;  // in minutes
+    double caloriesBurnt;
+
+public:
+    // Constructors
+    Exercise() : exerciseName(""), exerciseType(""), timeSpent(0), caloriesBurnt(0) {}
+    Exercise(string name, string type, double time, double calories)
+        : exerciseName(name), exerciseType(type), timeSpent(time), caloriesBurnt(calories) {}
+
+    // Getters
+    string getExerciseName() const { return exerciseName; }
+    string getExerciseType() const { return exerciseType; }
+    double getTimeSpent() const { return timeSpent; }
+    double getCaloriesBurnt() const { return caloriesBurnt; }
+
+    // Setters
+    void setExerciseName(string name) { exerciseName = name; }
+    void setExerciseType(string type) { exerciseType = type; }
+    void setTimeSpent(double time) { timeSpent = time; }
+    void setCaloriesBurnt(double calories) { caloriesBurnt = calories; }
+
+    // Print method
+    void printExerciseInfo() const {
+        cout << "Exercise Name: " << exerciseName << endl;
+        cout << "Exercise Type: " << exerciseType << endl;
+        cout << "Time Spent: " << timeSpent << " minutes" << endl;
+        cout << "Calories Burnt: " << caloriesBurnt << endl;
+    }
+};
+
+
+// Cardio Class (inherits from Exercise)
+class Cardio : public Exercise {
+private:
+    string intensity;
+    double distance;  // in kilometers
+
+public:
+    // Constructors
+    Cardio() : Exercise(), intensity(""), distance(0) {}
+    Cardio(string name, string type, double time, double calories, string intensity, double distance)
+        : Exercise(name, type, time, calories), intensity(intensity), distance(distance) {}
+
+    // Getters
+    string getIntensity() const { return intensity; }
+    double getDistance() const { return distance; }
+
+    // Setters
+    void setIntensity(string intensity) { this->intensity = intensity; }
+    void setDistance(double distance) { this->distance = distance; }
+
+    // Print method
+    void printCardioInfo() const {
+        printExerciseInfo();
+        cout << "Intensity: " << intensity << endl;
+        cout << "Distance: " << distance << " km" << endl;
+    }
+};
+
+// StrengthTraining Class (inherits from Exercise)
+class StrengthTraining : public Exercise {
+private:
+    int setsCount;
+    int repsCount;
+    double weight;  // in kilograms
+
+public:
+    // Constructors
+    StrengthTraining() : Exercise(), setsCount(0), repsCount(0), weight(0) {}
+    StrengthTraining(string name, string type, double time, double calories, int sets, int reps, double weight)
+        : Exercise(name, type, time, calories), setsCount(sets), repsCount(reps), weight(weight) {}
+
+    // Getters
+    int getSetsCount() const { return setsCount; }
+    int getRepsCount() const { return repsCount; }
+    double getWeight() const { return weight; }
+
+    // Setters
+    void setSetsCount(int sets) { setsCount = sets; }
+    void setRepsCount(int reps) { repsCount = reps; }
+    void setWeight(double weight) { this->weight = weight; }
+
+    // Print method
+    void printStrengthTrainingInfo() const {
+        printExerciseInfo();
+        cout << "Sets Count: " << setsCount << endl;
+        cout << "Reps Count: " << repsCount << endl;
+        cout << "Weight: " << weight << " kg" << endl;
+    }
+};
+
+
+//---------------------------------------------------------------------------------------------
+
 class DailyLog{
     string logName;
-    Meal *meals[100];
+    Meal *dailyMeals[100];   
+    Exercise *dailyExercie[100];
+    int exerciseCount { 0 };
     int mealCount { 0 };
     // add exercise array here
 
@@ -207,8 +310,8 @@ class DailyLog{
         }
 
         void addMeal(Meal *meal){
-            meals[mealCount] = meal;
-            meals[mealCount]->calculateCalorie();
+            dailyMeals[mealCount] = meal;
+            dailyMeals[mealCount]->calculateCalorie();
             mealCount++;
         }
 
@@ -218,7 +321,7 @@ class DailyLog{
 
         void printAllMeals(){
             for (int i = 0; i < mealCount ; i++){
-                cout << "#" << i+1 << " " << meals[i]->getMealInfo() << endl;
+                cout << "#" << i+1 << " " << dailyMeals[i]->getMealInfo() << endl;
             }
         }
  
@@ -301,7 +404,7 @@ class User{
         }
 
         void displayAllDailyLog(){
-            for (int i = 0; i < userLogCount + 1 ;i++){
+            for (int i = 0; i < userLogCount;i++){
                 cout << "#" << i + 1 << " Daily Log" << endl;
                 userLog[i].printAllMeals();
             }
@@ -325,7 +428,7 @@ class User{
 
         void setGoalStatus(int goalNum){
             if (goalNum - 1 < userGoalCount){
-                userGoal[goalNum].setGoalStatus();
+                userGoal[goalNum - 1].setGoalStatus();
                 cout << "Goal Successfully Changed" << endl;
             }
             else{
@@ -544,7 +647,12 @@ int main(){
         switch(choice){
             case 1:
                 tie(logged_in,userInfo) = log_in(&AllData);
-                status = 2;
+
+                if (logged_in){
+                    menu(userInfo);
+                    logged_in = false;
+                    status = 2;
+                }
                 break;
             case 2:
                 registerUser(&AllData);
@@ -557,9 +665,9 @@ int main(){
         }
     }
 
-    if (logged_in){
-        menu(userInfo);
-        logged_in = false;
-    }
+    // if (logged_in){
+    //     menu(userInfo);
+    //     logged_in = false;
+    // }
     return 0;
 }
